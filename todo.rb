@@ -22,24 +22,33 @@ class Todo < ActiveRecord::Base
     puts "#{self.id}. #{display_status} #{todo_text} #{display_date}"
   end
 
-  def self.to_displayable_list(a)
-    a.map { |todo| todo.to_displayable_string }
+  def self.overdue
+    where("due_date < ?", Date.today)
   end
+
+  def self.duetoday
+    where("due_date = ?", Date.today)
+  end
+
+  def self.duelater
+    where("due_date > ?", Date.today)
+  end
+
 
   def self.show_list
     puts "My Todo-list\n\n"
 
     puts "Overdue\n"
-    puts self.to_displayable_list(all.order(id: :asc).filter{|todo| todo.over_due?})
-    puts "\n\n"
+    puts overdue.order(due_date: :asc).map { |todo| todo.to_displayable_string }
+    puts "\n"
 
     puts "Due Today\n"
-    puts self.to_displayable_list(all.order(id: :asc).filter{|todo| todo.due_today?})
-    puts "\n\n"
+    puts duetoday.order(due_date: :asc).map { |todo| todo.to_displayable_string }
+    puts "\n"
 
     puts "Due Later\n"
-    puts self.to_displayable_list(all.order(id: :asc).filter{|todo| todo.due_later?})
-    puts "\n\n"
+    puts duelater.order(due_date: :asc).map { |todo| todo.to_displayable_string }
+    puts "\n"
   end
 
   def self.add_task(h)
