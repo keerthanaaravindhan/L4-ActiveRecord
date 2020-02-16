@@ -1,6 +1,8 @@
 require "active_record"
 require "./connect_db"
 
+
+
 class Todo < ActiveRecord::Base
   def due_today?
     due_date == Date.today
@@ -20,31 +22,23 @@ class Todo < ActiveRecord::Base
     puts "#{self.id}. #{display_status} #{todo_text} #{display_date}"
   end
 
+  def self.to_displayable_list(a)
+    a.map { |todo| todo.to_displayable_string }
+  end
+
   def self.show_list
     puts "My Todo-list\n\n"
 
     puts "Overdue\n"
-    all.each do |todo|
-      if todo.over_due?
-        todo.to_displayable_string
-      end
-    end
+    puts self.to_displayable_list(all.order(id: :asc).filter{|todo| todo.over_due?})
     puts "\n\n"
 
     puts "Due Today\n"
-    all.each do |todo|
-      if todo.due_today?
-        todo.to_displayable_string
-      end
-    end
+    puts self.to_displayable_list(all.order(id: :asc).filter{|todo| todo.due_today?})
     puts "\n\n"
 
     puts "Due Later\n"
-    all.each do |todo|
-      if todo.due_later?
-        todo.to_displayable_string
-      end
-    end
+    puts self.to_displayable_list(all.order(id: :asc).filter{|todo| todo.due_later?})
     puts "\n\n"
   end
 
